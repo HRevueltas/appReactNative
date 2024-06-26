@@ -21,32 +21,32 @@ const FixedScheduleScheduler = () => {
   }, []);
 
   // Guardar el horario programado en AsyncStorage
-  const saveScheduleToStorage = async () => {
-    try {
-      const storedSchedule = await AsyncStorage.setItem('fixedSchedule', JSON.stringify(schedule));
-      // mostrar horario programado en consola
-      console.log('Horario programado guardado:', schedule);
-    } catch (error) {
-      console.error('Error saving schedule to AsyncStorage:', error);
-    }
-  };
+  // const saveScheduleToStorage = async () => {
+  //   try {
+  //     const storedSchedule = await AsyncStorage.setItem('fixedSchedule', JSON.stringify(schedule));
+  //     // mostrar horario programado en consola
+  //     console.log('Horario programado guardado:', schedule);
+  //   } catch (error) {
+  //     console.error('Error saving schedule to AsyncStorage:', error);
+  //   }
+  // };
 
   // Cargar horario programado desde AsyncStorage
   const loadScheduleFromStorage = async () => {
     try {
       const storedSchedule = await AsyncStorage.getItem('fixedSchedule');
-      console.log('Horario programado almacenado:', storedSchedule);
+      // console.log('Horario programado almacenado:', storedSchedule);
       if (storedSchedule !== null) {
         const parsedSchedule = JSON.parse(storedSchedule);
         parsedSchedule.forEach(item => {
           item.time = new Date(item.time); // Convertir time de vuelta a objeto Date
         });
 
-        console.log('Horario programado cargado:', parsedSchedule);
+        // console.log('Horario programado cargado:', parsedSchedule);
         setSchedule(parsedSchedule);
       }
     } catch (error) {
-      console.error('Error loading schedule from AsyncStorage:', error);
+      console.error('Error al  cargar horario programado desde AsyncStorage:', error);
     }
   };
 
@@ -87,9 +87,13 @@ const FixedScheduleScheduler = () => {
       // Cargar desde AsyncStorage
       loadScheduleFromStorage();
 
+      if(section === 'todas'){
+        Alert.alert('Horario programado', `Se programó ${command === 'encender' ? 'encendido' : 'apagado'} para todas las secciones en ${getDayName(day)} a las ${newTime.toLocaleTimeString([], { hour12: true, hour: '2-digit', minute: '2-digit' })}`);
+      }else{
       Alert.alert('Horario programado', `Se programó ${command === 'encender' ? 'encendido' : 'apagado'} para la sección ${getSectionName(section)} en ${getDayName(day)} a las ${newTime.toLocaleTimeString([], { hour12: true, hour: '2-digit', minute: '2-digit' })}`);
+      }
     } catch (error) {
-      console.error('Error saving schedule to AsyncStorage:', error);
+      console.error('Error Hubo un problema al guardar el horario:', error);
       Alert.alert('Error', 'Hubo un problema al guardar el horario.');
     }
   };
@@ -113,7 +117,10 @@ const FixedScheduleScheduler = () => {
               <Text style={[styles.scheduleText, styles.firstColumn]}>{getSectionName(sectionId)}</Text>
               <Text style={styles.scheduleText}>{encendidoText}</Text>
               <Text style={styles.scheduleText}>{apagadoText}</Text>
-              <TouchableOpacity style={styles.cancelButton} onPress={() => cancelSchedule(sectionId, day)}>
+              <TouchableOpacity 
+              disabled={encendidoText === "Sin horario" && apagadoText == "Sin horario"? true: false} 
+              style={  encendidoText === "Sin horario" && apagadoText == "Sin horario" ? styles.disabledButton : styles.cancelButton} 
+              onPress={() => confirmCancelSchedule(sectionId, day)}>
                 <Ionicons name="trash-outline" size={24} color="white" />
               </TouchableOpacity>
             </View>
@@ -122,6 +129,24 @@ const FixedScheduleScheduler = () => {
       </View>
     );
   };
+
+// Mostrar alerta de confirmación antes de cancelar el horario
+const confirmCancelSchedule = (sectionId, day) => {
+  Alert.alert(
+    'Confirmación',
+    `¿Estás seguro que deseas cancelar el horario para la sección ${getSectionName(sectionId)} en ${getDayName(day)}?`,
+    [
+      {
+        text: 'Cancelar',
+        style: 'cancel',
+      },
+      {
+        text: 'Confirmar',
+        onPress: () => cancelSchedule(sectionId, day),
+      },
+    ]
+  );
+};
 
   // Cancelar todos los horarios programados para el día y sección seleccionados
   const cancelSchedule = async (sectionId, day) => {
@@ -149,14 +174,13 @@ const FixedScheduleScheduler = () => {
         const logMessage = `Cancelados los horarios para ${getSectionName(sectionId)} el ${getDayName(day)}`;
         saveLog(sectionName, logMessage); // Llamar a saveLog con los parámetros adecuados
 
-        console.log('Horario cancelado:', updatedSchedule);
         Alert.alert('Horario cancelado', `Todos los horarios para la sección ${getSectionName(sectionId)} en ${getDayName(day)} han sido cancelados.`);
       } else {
-        Alert.alert('Error', `Hubo un problema al cancelar el horario en el ESP32: ${await response.text()}`);
+        Alert.alert('Error', `Hubo un problema al cancelar el horario: ${await response.text()}`);
       }
     } catch (error) {
-      console.error('Error cancelling schedule on ESP32:', error);
-      Alert.alert('Error', `No se pudo cancelar el horario en el ESP32: ${error.message}`);
+      console.error('Error al cancelar horario:', error);
+      Alert.alert('Error', `No se pudo cancelar el horario: ${error.message}`);
     }
   };
 
@@ -165,32 +189,51 @@ const FixedScheduleScheduler = () => {
     const baseUrl = 'http://192.168.1.34'; // Reemplaza esto con la URL base del ESP32
     const url = `${baseUrl}/cancel_all_fixed_schedules`;
 
-    try {
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'text/plain'
-        }
-      });
+    Alert.alert(
+      'Confirmación',
+      '¿Estás seguro que deseas cancelar los horarios de todos los días?',
+      [
+        {
+          text: 'Cancelar',
+          style: 'cancel',
+        },
+        {
+          text: 'Confirmar',
+          onPress: async () => {
+            try {
+              const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                  'Content-Type': 'text/plain'
+                }
+              });
 
-      if (response.ok) {
-        setSchedule([]);
-        AsyncStorage.removeItem('fixedSchedule');
+              if (response.ok) {
+                // Actualizar el estado local eliminando todos los horarios
+                setSchedule([]);
 
-        // Actualizar logs
-        const logMessage = 'Cancelados todos los horarios programados';
-        saveLog('todos', logMessage); // Llamar a saveLog con los parámetros adecuados
+                // Guardar en AsyncStorage
+                await AsyncStorage.removeItem('fixedSchedule');
 
+                // Actualizar logs
+                const logMessage = 'Cancelados los horarios de todos los días';
+                saveLog('todas', logMessage); // Llamar a saveLog con los parámetros adecuados
 
-        Alert.alert('Todos los horarios cancelados', 'Todos los horarios programados han sido cancelados.');
-      } else {
-        Alert.alert('Error', `Hubo un problema al cancelar todos los horarios en el ESP32: ${await response.text()}`);
-      }
-    } catch (error) {
-      console.error('Error cancelling all schedules on ESP32:', error);
-      Alert.alert('Error', `No se pudo cancelar todos los horarios en el ESP32: ${error.message}`);
-    }
+                console.log('Todos los horarios cancelados.');
+                Alert.alert('Horarios cancelados', 'Todos los horarios han sido cancelados.');
+              } else {
+                Alert.alert('Error', `Hubo un problema al cancelar los horarios en el ESP32: ${await response.text()}`);
+              }
+            } catch (error) {
+              console.error('Error cancelling all schedules on ESP32:', error);
+              Alert.alert('Error', `No se pudo cancelar los horarios en el ESP32: ${error.message}`);
+            }
+          },
+        },
+      ]
+    );
   };
+
 
   // Obtener el nombre del día a partir de su número
   const getDayName = (day) => {
@@ -270,14 +313,14 @@ const FixedScheduleScheduler = () => {
       console.log('¿Respondió con exito?:', response.ok);
       console.log('Codigo de respuesta:', response.status);
       if (response.ok) {
-        console.log('ESP32 mensaje respuesta ++++++++:', await response.text());
+        // console.log('ESP32 mensaje respuesta ++++++++:', await response.text());
         addScheduleItem(action); // Agregar el ítem al horario programado
       } else {
-        Alert.alert('Error', `Hubo un problema al enviar el horario al ESP32: ${await response.text()}`);
+        Alert.alert('Error', `Hubo un problema al enviar el horario: ${await response.text()}`);
       }
     } catch (error) {
-      console.error('Error sending schedule to ESP32:', error);
-      Alert.alert('Error', `No se pudo enviar el horario al ESP32: ${error.message}`);
+      console.error('Error al enviar el horario:', error);
+      Alert.alert('Error', `No se pudo enviar el horario: ${error.message}`);
     }
   };
 
@@ -323,10 +366,20 @@ const FixedScheduleScheduler = () => {
         </TouchableOpacity>
       </View>
 
-      <Text style={styles.scheduledTimesTitle}>Horarios programados para el día {getDayName(day)}:
+      <Text style={styles.scheduledTimesTitle}>Horarios programados para el día <Text style={styles.dayNameStyle}>{getDayName(day)}</Text>:
 
       </Text>
-      {renderScheduledTimes()}
+      <View style={styles.tableContainer}>
+        <View style={styles.tableHeader}>
+          <Text style={[styles.tableHeaderText, styles.firstColumn]}>Sección</Text>
+          <Text style={[styles.tableHeaderText, styles.encendido]}>Encendido</Text>
+          <Text style={[styles.tableHeaderText, styles.apagado]}>Apagado</Text>
+          <Text style={styles.tableHeaderText}>Cancelar</Text>
+        </View>
+        <ScrollView style={styles.tableBody}>
+          {renderScheduledTimes()}
+        </ScrollView>
+      </View>
 
       <TouchableOpacity style={styles.cancelAllButton} onPress={cancelAllSchedules}>
         <Text style={styles.cancelAllButtonText}>Cancelar horarios de todos los días </Text>
@@ -383,17 +436,61 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 10,
   },
+  tableContainer: {
+    borderWidth: 1,
+    borderColor: '#DDDDDD',
+    borderRadius: 5,
+    overflow: 'hidden',
+  },
+  tableHeader: {
+    flexDirection: 'row',
+    backgroundColor: '#F5F5F5',
+    paddingVertical: 10,
+    paddingHorizontal: 5,
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+
+  },
+  tableHeaderText: {
+    flex: 1,
+    fontSize: 14,
+    // paddingLeft: 4,
+    // marginLeft: 0,
+    // alignItems: 'center',
+    fontWeight: 'bold',
+
+  },
+  encendido: {
+    flex: 1,
+    textAlign: 'center',
+    color: 'green',
+  },
+  apagado: {
+    flex: 1,
+    textAlign: 'center',
+    color: 'red',
+  },
+  dayNameStyle: {
+    color: 'blue',
+  },
+  firstColumn: { 
+    flex: 1.5,
+    paddingRight: 4,
+  },
+  tableBody: {
+    maxHeight: 250,
+  },
   scheduleItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 5,
+    borderBottomWidth: 1,
+    borderBottomColor: '#DDDDDD',
   },
   scheduleText: {
     flex: 1,
-    fontSize: 16,
-  },
-  firstColumn: {
-    flex: 1.5,
+    fontSize: 14,
   },
   cancelButton: {
     marginLeft: 10,
@@ -408,14 +505,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 20,
   },
+
+  disabledButton: {
+    padding: 10,
+    backgroundColor: '#ccc',
+    borderRadius: 5,
+    padding: 5,
+  },
   cancelAllButtonText: {
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
   },
-  scrollViewContainer: {
-    maxHeight: 250,
-  },
 });
+
 
 export default FixedScheduleScheduler;

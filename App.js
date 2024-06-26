@@ -27,10 +27,10 @@ const TabNavigator = () => (
         else if (route.name === 'fixedScheduler') {
           iconName = 'calendar';
         }
-
+ 
         return <Ionicons name={iconName} size={size} color={color} />;
       },
-      tabBarActiveTintColor: '#14274d',
+      tabBarActiveTintColor: '#0b4dd1',
       tabBarInactiveTintColor: 'gray',
     })}
   >

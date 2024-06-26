@@ -13,21 +13,21 @@ const Scheduler = () => {
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [error, setError] = useState(null);
   const [dialogVisible, setDialogVisible] = useState(false);
-  const [dialogMessage, setDialogMessage] = useState('');
+  const [dialogMessage, setDialogMessage] = useState(''); 
 
   const scheduleAction = (action) => {
     const formattedDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
-    console.log('Fecha formateada:', formattedDate);
+    // console.log('Fecha formateada:', formattedDate);
     const url = `http://192.168.1.34/schedule?section=${section}&time=${formattedDate}&action=${action}`;
 
 
     axios.get(url)
       .then(response => {
-        console.log('Respuesta exitosa:', response.data);
+        // console.log('Respuesta exitosa:', response.data);
         setError(null);
         
         const formattedTime = `${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
-        console.log('formattedTime:', formattedTime);
+        // console.log('formattedTime:', formattedTime);
         
         const info = { section, time: formattedTime, action };
         setDialogMessage(`Se programó ${info.action === 'encender' ? 'encendido' : 'apagado'} para:\nSección: ${info.section}\nHorario: ${info.time}`);
@@ -68,7 +68,7 @@ const Scheduler = () => {
           onPress: () => {
             axios.get(url)
               .then(response => {
-                console.log('Cancelación exitosa:', response.data);
+                // console.log('Cancelación exitosa:', response.data);
                 setError(null);
                 setDialogMessage('Todas las programaciones fueron canceladas.');
                 setDialogVisible(true);
