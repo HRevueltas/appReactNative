@@ -44,7 +44,7 @@ const ControlPanel = () => {
                     setSections({
                         'salones-entrada': isOn,
                         'callejon': isOn,
-                        'rectoria-infor': isOn,
+                        'rectoria-informatica': isOn,
                         'preescolar': isOn,
                         // 'bachillerato-1': isOn,
                         // 'bachillerato-2': isOn,
@@ -95,8 +95,8 @@ const ControlPanel = () => {
                 />
                 <ButtonSection
                     nombre={'Rectoria e Informatica'}
-                    section="rectoria-infor"
-                    isOn={sections['rectoria-infor']}
+                    section="rectoria-informatica"
+                    isOn={sections['rectoria-informatica']}
                     onToggle={handleToggle}
                 />
                 <ButtonSection

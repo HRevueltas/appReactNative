@@ -307,6 +307,7 @@ const styles = StyleSheet.create({
   },
   tableData: {
     flex: 1,
+    padding: 1,
   },
   showMoreButton: {
     backgroundColor: 'blue',

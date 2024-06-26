@@ -124,7 +124,7 @@ const Scheduler = () => {
         <Picker.Item label="Todas" value="todas" />
         <Picker.Item label="Salones Entrada" value="salones-entrada" />
         <Picker.Item label="Callejón" value="callejon" />
-        <Picker.Item label="Rectoría e Informática" value="rectoria-infor" />
+        <Picker.Item label="Rectoría e Informática" value="rectoria-informatica" />
         <Picker.Item label="Preescolar" value="preescolar" />
         {/* <Picker.Item label="Bachillerato 1" value="bachillerato-1" /> */}
         {/* <Picker.Item label="Bachillerato 2" value="bachillerato-2" /> */}

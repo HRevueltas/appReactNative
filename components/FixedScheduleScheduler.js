@@ -218,13 +218,13 @@ const FixedScheduleScheduler = () => {
   const getSectionName = (sectionId) => {
     switch (sectionId) {
       case '1':
-        return 'Salones Entrada';
+        return 'salones-entrada';
       case '2':
-        return 'Callejón';
+        return 'callejon';
       case '3':
-        return 'Rectoría e Informática';
+        return 'rectoria-informatica';
       case '4':
-        return 'Preescolar';
+        return 'preescolar';
       default:
         return '';
     }
