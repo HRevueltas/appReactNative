@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "automatizacionApp",
+    "name": "Automatización luces",
     "slug": "automatizacionApp",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -18,10 +18,16 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.herggo.automatizacionApp"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "b4788b9e-c85b-4a73-9ebe-b0afea4176d4"
+      }
     }
   }
 }
