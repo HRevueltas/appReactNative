@@ -109,8 +109,8 @@ const FixedScheduleScheduler = () => {
           const sectionEncendidoSchedule = filteredSchedule.find(item => item.section === sectionId && item.command === 'encender');
           const sectionApagadoSchedule = filteredSchedule.find(item => item.section === sectionId && item.command === 'apagar');
 
-          const encendidoText = sectionEncendidoSchedule ? sectionEncendidoSchedule.time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Sin horario';
-          const apagadoText = sectionApagadoSchedule ? sectionApagadoSchedule.time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Sin horario';
+          const encendidoText = sectionEncendidoSchedule ? sectionEncendidoSchedule.time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12:true }) : 'Sin horario';
+          const apagadoText = sectionApagadoSchedule ? sectionApagadoSchedule.time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12:true }) : 'Sin horario';
 
           return (
             <View key={sectionId} style={styles.scheduleItem}>
@@ -350,7 +350,9 @@ const confirmCancelSchedule = (sectionId, day) => {
 
       <Text style={styles.label}>Selecciona la hora:</Text>
       <TouchableOpacity onPress={showTimepicker} style={styles.timePickerButton}>
-        <Text style={styles.timePickerButtonText}>{time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</Text>
+        <Text style={styles.timePickerButtonText}>{time.toLocaleTimeString([], {  hour: '2-digit', minute: '2-digit', hour12: true
+
+         })}</Text>
       </TouchableOpacity>
       {showTimePicker && (
         <DateTimePicker value={time} mode="time" display="default" onChange={handleTimeChange} />

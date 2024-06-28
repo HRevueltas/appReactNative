@@ -169,7 +169,9 @@ const filteredLogs = useMemo(() => {
   });
 }, [logs, search, sectionFilter, startDate, endDate]);
   console.log('registros cargados:', logs.length);
+  console.log('registros cargados:', logs);
   console.log('registros filtrados:', filteredLogs.length);
+  console.log('registros filtrados:', filteredLogs);
   return (
     <View style={styles.container}>
       <Filters
